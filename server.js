@@ -6,10 +6,10 @@ const bodyParser = require('body-parser')
 const fs = require("fs")
 const https = require("https")
 
-var options = {
-  key: fs.readFileSync("./private.key"),
-  cert: fs.readFileSync("./certificate.crt"),
-};
+// var options = {
+//   key: fs.readFileSync("./private.key"),
+//   cert: fs.readFileSync("./certificate.crt"),
+// };
 
 require("dotenv").config();
 
@@ -20,17 +20,17 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 
-// app.listen(PORT, () => {
-//   console.log(`using port: ${PORT}`);
-// });
+app.listen(PORT, () => {
+  console.log(`using port: ${PORT}`);
+});
 
 // const server = https.createServer(options, app).listen(PORT, function(){
 //   console.log("Express server listening on port " + PORT);
 // });
 
-const server = https.createServer(app).listen(PORT, function(){
-  console.log("Express server listening on port " + PORT);
-});
+// const server = https.createServer(app).listen(PORT, function(){
+//   console.log("Express server listening on port " + PORT);
+// });
 
 
 //CONNECT TO MONGODB ATLAS
