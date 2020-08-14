@@ -3,6 +3,7 @@ const Schema = mongoose.Schema;
 
 const reply = new Schema({
     name: String,
+    repliedToName: String,
     email: String,
     year: String,
     month: String,
@@ -11,8 +12,9 @@ const reply = new Schema({
     replies: [Array],
     hour: String,
     minute: String,
+    replyIndex: Number,
     
 })
 
-const ReplySchema = mongoose.model("Reply",reply);
-module.exports = ReplySchema
+const PhuketReplySchema = mongoose.model("PhuketReply",reply);
+module.exports = PhuketReplySchema

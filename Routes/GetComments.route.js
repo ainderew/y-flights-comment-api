@@ -5,7 +5,7 @@ const ArticleCommentSchema = require("../Models/Article-1-comments.model");
 const BangkokCommentSchema = require("../Models/Bangkok-comments.model");
 const ThailandCommentSchema = require("../Models/Thailand-comments.model");
 
-const ReplySchema = require("../Models/reply.model")
+const PhuketReplySchema = require("../Models/PhuketReply.model")
 
 router.get("/PhuketComments", async (req,res) =>{
     console.log("PhuketComments hit")
@@ -32,9 +32,8 @@ router.get("/ThailandComments", async (req,res) =>{
 //GET REPLIES
 router.post("/PhuketReplies", async (req,res) =>{
     const {replyId} = req.body
-    const comment = await ReplySchema.findOne({_id: replyId})
+    const comment = await PhuketReplySchema.findOne({_id: replyId})
     res.json(comment)
-    
 })
 
 

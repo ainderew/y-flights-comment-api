@@ -6,14 +6,14 @@ const ArticleCommentSchema = require("../Models/Article-1-comments.model");
 const BangkokCommentSchema = require("../Models/Bangkok-comments.model");
 const ThailandCommentSchema = require("../Models/Thailand-comments.model");
 //REPLY SCHEMA
-const ReplySchema = require("../Models/reply.model");
+const PhuketReplySchema = require("../Models/PhuketReply.model");
 
 
 // PHUKET POST COMMENT ROUTE
-router.post("/PhuketPostComment", (req, res) => {
+router.post("/PhuketPostComment", async (req, res) => {
   const { name, email, comment } = req.body;
   const status = commentHandler(name, email, comment, PhuketCommentSchema)
-
+  console.log(req.body)
   if (status){
     res.json("successful");
   }else{
@@ -22,16 +22,46 @@ router.post("/PhuketPostComment", (req, res) => {
   
 });
 
-router.post("/PhuketPostReply", (req,res) => {
-  const {name, email, comment, commentId} = req.body;
+router.post("/PhuketPostReply", async (req,res) => {
+  const {name, email, comment, commentId, repliedToName} = req.body;
+  let generatedReplyIndex;
   const generatedId = mongoose.Types.ObjectId();
-  const status = replyHandler(name, email, comment, commentId, ReplySchema, generatedId, PhuketCommentSchema)
-  // console.log(req.body)
-  if (status){
-    res.json("successful");
-  }else{
-    res.json(status)
+  
+  const fetchLatestReply = async() =>{
+    const latestReply = await PhuketReplySchema.findOne().sort({ _id: -1 })
+    
+    return latestReply
   }
+ 
+  
+  const latestReply = await fetchLatestReply()
+
+  if (latestReply === null){
+    generatedReplyIndex = 0;
+    console.log("reply was null")
+    console.log(latestReply)
+    const status = await replyHandler(name, email, comment, commentId, repliedToName, generatedReplyIndex, PhuketReplySchema, generatedId, PhuketCommentSchema)
+    if (status){
+      res.json("successful");
+    }else{
+      res.json(status)
+    }
+  
+  }else{
+    generatedReplyIndex = latestReply.replyIndex + 1
+    console.log("reply was NOT null")
+    console.log(latestReply)
+    const status = await replyHandler(name, email, comment, commentId, repliedToName, generatedReplyIndex, PhuketReplySchema, generatedId, PhuketCommentSchema)
+    if (status){
+      res.json("successful");
+    }else{
+      res.json(status)
+    }
+  }
+  
+   
+  
+  
 })
 
 
@@ -83,6 +113,7 @@ router.post("/PhuketPostComment", (req, res) => {
 
 // FUNCTIONS = = = = = = = = = = = = = = = = = 
 const commentHandler = (name, email, comment, schema) =>{
+  console.log(name)
   try {
     const commentPost = new schema({
     name: name,
@@ -103,13 +134,13 @@ const commentHandler = (name, email, comment, schema) =>{
   }
 }
 
-const replyHandler = async (name, email, comment, commentId, schema, generatedId, originSchema) =>{
-  console.log(generatedId);
-  console.log(originSchema);
+const replyHandler = async (name, email, comment, commentId, repliedToName, replyIndex, schema, generatedId, originSchema) =>{
+  console.log(replyIndex);
   try {
     const reply = new schema({
     _id: generatedId,
     name: name,
+    repliedToName: repliedToName,
     email: email,
     year: getYear(),
     month: getMonth(),
@@ -117,6 +148,7 @@ const replyHandler = async (name, email, comment, commentId, schema, generatedId
     comment: comment,
     hour: getHour(),
     minute: getMinute(),
+    replyIndex: replyIndex,
     });
 
     reply.save();
@@ -180,6 +212,8 @@ const getMinute = () => {
   const minute = initDate.getMinutes()
   if (minute === 0){
     minute = 00
+  }else if (minute < 10){
+    minute = "0" + minute
   }
   
   return minute;
