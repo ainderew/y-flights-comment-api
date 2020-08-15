@@ -2,11 +2,16 @@ const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
 const PhuketCommentSchema = require("../Models/Phuket-comments.model");
-const ArticleCommentSchema = require("../Models/Article-1-comments.model");
+const Article1CommentSchema = require("../Models/Article-1-comments.model");
 const BangkokCommentSchema = require("../Models/Bangkok-comments.model");
 const ThailandCommentSchema = require("../Models/Thailand-comments.model");
+const BaliCommentSchema = require("../Models/Bali-comments.model");
 //REPLY SCHEMA
 const PhuketReplySchema = require("../Models/PhuketReply.model");
+const ThailandReplySchema = require("../Models/Thailand-reply.model")
+const Article1ReplySchema = require("../Models/Article-1-Reply.model")
+const BangkokReplySchema = require("../Models/Bangkok-reply.model")
+const BaliReplySchema = require("../Models/Bali-reply.model")
 
 
 // PHUKET POST COMMENT ROUTE
@@ -58,18 +63,17 @@ router.post("/PhuketPostReply", async (req,res) => {
       res.json(status)
     }
   }
-  
-   
-  
-  
+
 })
 
+//END OF PHUKET COMMENT ROUTES - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-// THAILAND POST COMMENT ROUTE
-router.post("/PhuketPostComment", (req, res) => {
+
+// THAILAND POST COMMENT ROUTE ===================================================================
+router.post("/ThailandPostComment", async (req, res) => {
   const { name, email, comment } = req.body;
   const status = commentHandler(name, email, comment, ThailandCommentSchema)
-
+  console.log(req.body)
   if (status){
     res.json("successful");
   }else{
@@ -78,11 +82,53 @@ router.post("/PhuketPostComment", (req, res) => {
   
 });
 
-// ARTICLE-1 POST COMMENT ROUTE
-router.post("/PhuketPostComment", (req, res) => {
+router.post("/ThailandPostReply", async (req,res) => {
+  const {name, email, comment, commentId, repliedToName} = req.body;
+  let generatedReplyIndex;
+  const generatedId = mongoose.Types.ObjectId();
+  
+  const fetchLatestReply = async() =>{
+    const latestReply = await ThailandReplySchema.findOne().sort({ _id: -1 })
+    
+    return latestReply
+  }
+ 
+  
+  const latestReply = await fetchLatestReply()
+
+  if (latestReply === null){
+    generatedReplyIndex = 0;
+    console.log("reply was null")
+    console.log(latestReply)
+    const status = await replyHandler(name, email, comment, commentId, repliedToName, generatedReplyIndex, ThailandReplySchema, generatedId, ThailandCommentSchema)
+    if (status){
+      res.json("successful");
+    }else{
+      res.json(status)
+    }
+  
+  }else{
+    generatedReplyIndex = latestReply.replyIndex + 1
+    console.log("reply was NOT null")
+    console.log(latestReply)
+    const status = await replyHandler(name, email, comment, commentId, repliedToName, generatedReplyIndex, ThailandReplySchema, generatedId, ThailandCommentSchema)
+    if (status){
+      res.json("successful");
+    }else{
+      res.json(status)
+    }
+  }
+
+})
+
+//END OF THAILAND COMMENT ROUTES - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+
+// ARTICLE-1 POST COMMENT ROUTE ====================================================================================================================================
+router.post("/Article1PostComment", async (req, res) => {
   const { name, email, comment } = req.body;
-  const status = commentHandler(name, email, comment, ArticleCommentSchema)
-
+  const status = commentHandler(name, email, comment, Article1CommentSchema)
+  console.log(req.body)
   if (status){
     res.json("successful");
   }else{
@@ -91,11 +137,54 @@ router.post("/PhuketPostComment", (req, res) => {
   
 });
 
-// BANGKOK POST COMMENT ROUTE
-router.post("/PhuketPostComment", (req, res) => {
+router.post("/Article1PostReply", async (req,res) => {
+  const {name, email, comment, commentId, repliedToName} = req.body;
+  let generatedReplyIndex;
+  const generatedId = mongoose.Types.ObjectId();
+  
+  const fetchLatestReply = async() =>{
+    const latestReply = await Article1ReplySchema.findOne().sort({ _id: -1 })
+    
+    return latestReply
+  }
+ 
+  
+  const latestReply = await fetchLatestReply()
+
+  if (latestReply === null){
+    generatedReplyIndex = 0;
+    console.log("reply was null")
+    console.log(latestReply)
+    const status = await replyHandler(name, email, comment, commentId, repliedToName, generatedReplyIndex, PhuketArticle1ReplySchemaReplySchema, generatedId, Article1CommentSchema)
+    if (status){
+      res.json("successful");
+    }else{
+      res.json(status)
+    }
+  
+  }else{
+    generatedReplyIndex = latestReply.replyIndex + 1
+    console.log("reply was NOT null")
+    console.log(latestReply)
+    const status = await replyHandler(name, email, comment, commentId, repliedToName, generatedReplyIndex, Article1ReplySchema, generatedId, Article1CommentSchema)
+    if (status){
+      res.json("successful");
+    }else{
+      res.json(status)
+    }
+  }
+
+})
+
+//END OF ARTICLE 1 COMMENT ROUTES - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+
+
+// BANGKOK POST COMMENT ROUTE ====================================================================================================================================
+router.post("/BangkokPostComment", async (req, res) => {
   const { name, email, comment } = req.body;
   const status = commentHandler(name, email, comment, BangkokCommentSchema)
-
+  console.log(req.body)
   if (status){
     res.json("successful");
   }else{
@@ -104,8 +193,103 @@ router.post("/PhuketPostComment", (req, res) => {
   
 });
 
+router.post("/BangkokPostReply", async (req,res) => {
+  const {name, email, comment, commentId, repliedToName} = req.body;
+  let generatedReplyIndex;
+  const generatedId = mongoose.Types.ObjectId();
+  
+  const fetchLatestReply = async() =>{
+    const latestReply = await BangkokReplySchema.findOne().sort({ _id: -1 })
+    
+    return latestReply
+  }
+ 
+  
+  const latestReply = await fetchLatestReply()
+
+  if (latestReply === null){
+    generatedReplyIndex = 0;
+    console.log("reply was null")
+    console.log(latestReply)
+    const status = await replyHandler(name, email, comment, commentId, repliedToName, generatedReplyIndex, BangkokReplySchema, generatedId, BangkokCommentSchema)
+    if (status){
+      res.json("successful");
+    }else{
+      res.json(status)
+    }
+  
+  }else{
+    generatedReplyIndex = latestReply.replyIndex + 1
+    console.log("reply was NOT null")
+    console.log(latestReply)
+    const status = await replyHandler(name, email, comment, commentId, repliedToName, generatedReplyIndex, BangkokReplySchema, generatedId, BangkokCommentSchema)
+    if (status){
+      res.json("successful");
+    }else{
+      res.json(status)
+    }
+  }
+
+})
+
+//END OF BANGKOK COMMENT ROUTES - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 
+
+
+// BALI POST COMMENT ROUTE ====================================================================================================================================
+router.post("/BaliPostComment", async (req, res) => {
+  const { name, email, comment } = req.body;
+  const status = commentHandler(name, email, comment, BaliCommentSchema)
+  console.log(req.body)
+  if (status){
+    res.json("successful");
+  }else{
+    res.json(status)
+  }
+  
+});
+
+router.post("/BaliPostReply", async (req,res) => {
+  const {name, email, comment, commentId, repliedToName} = req.body;
+  let generatedReplyIndex;
+  const generatedId = mongoose.Types.ObjectId();
+  
+  const fetchLatestReply = async() =>{
+    const latestReply = await BaliReplySchema.findOne().sort({ _id: -1 })
+    
+    return latestReply
+  }
+ 
+  
+  const latestReply = await fetchLatestReply()
+
+  if (latestReply === null){
+    generatedReplyIndex = 0;
+    console.log("reply was null")
+    console.log(latestReply)
+    const status = await replyHandler(name, email, comment, commentId, repliedToName, generatedReplyIndex, BaliReplySchema, generatedId, BaliCommentSchema)
+    if (status){
+      res.json("successful");
+    }else{
+      res.json(status)
+    }
+  
+  }else{
+    generatedReplyIndex = latestReply.replyIndex + 1
+    console.log("reply was NOT null")
+    console.log(latestReply)
+    const status = await replyHandler(name, email, comment, commentId, repliedToName, generatedReplyIndex, BaliReplySchema, generatedId, BaliCommentSchema)
+    if (status){
+      res.json("successful");
+    }else{
+      res.json(status)
+    }
+  }
+
+})
+
+//END OF BALI COMMENT ROUTES - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 
 
