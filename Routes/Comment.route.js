@@ -155,7 +155,7 @@ router.post("/Article1PostReply", async (req,res) => {
     generatedReplyIndex = 0;
     console.log("reply was null")
     console.log(latestReply)
-    const status = await replyHandler(name, email, comment, commentId, repliedToName, generatedReplyIndex, PhuketArticle1ReplySchemaReplySchema, generatedId, Article1CommentSchema)
+    const status = await replyHandler(name, email, comment, commentId, repliedToName, generatedReplyIndex, Article1ReplySchema, generatedId, Article1CommentSchema)
     if (status){
       res.json("successful");
     }else{
